@@ -6,10 +6,12 @@
  * @param color 颜色
  */
 function drawPixel(ctx,x,y,color) {
+    const height = ctx.canvas.height;
+    y = height - y;
+    // 坐标原点在左下角
     ctx.fillStyle = color;
     ctx.fillRect(x, y, 1, 1);
 }
-
 /**
  * 绘制线
  * @param ctx  canvas上下文
@@ -70,32 +72,25 @@ function drawTriangle(ctx,x0,y0,x1,y1,x2,y2,color) {
         var tmp = y1; y1 = y2; y2 = tmp;
         tmp = x1;  x1 = x2; x2 = tmp;
     }
-
-//    drawLine(ctx,x0,y0,x1,y1,color)
-
-    //var p0 = y2 - y0;
-
     var h02 = Math.abs(y0-y2);
     var h01 = Math.abs(y0-y1);
+    var h12 = Math.abs(y1-y2);
 
     for(var y = y0;y < y1; y++)
     {
-        var deltaY = y0- y;
+        var deltaY = Math.abs(y-y0);
         var xl = x0 + (x2-x0) * deltaY / h02;
         var xr = x0 + (x1-x0) * deltaY / h01;
         drawLine(ctx,xr,y,xl,y,color)
     }
 
-   /* var height = y2 - y1;
-    var distanceX = x2 - x1;
-    for(var y = y0;y < y1; y++)
+    for(var y = y2;y >= y1; y--)
     {
-        var dY = y - y0;
-        var dX = distanceX * (dY / height);
-        var x = x1 +dX;
-
-        drawPixel(ctx,x,y,color)
-    }*/
+        var deltaY = Math.abs(y - y2);
+        var xl = x2 + (x1 - x2) * deltaY / h12;
+        var xr = x2 + (x0 - x2) * deltaY / h02;
+        drawLine(ctx,xr,y,xl,y,color)
+    }
 }
 
 ///////// main /////////
@@ -107,9 +102,9 @@ const width = c.width;
 const height = c.height;
 
 // 画三角形线框
-var p0 = {x:width/2.0,y:height/4.0}
-var p1 = {x:width/4.0,y:height*3/4.0}
-var p2 = {x:width*3/4.0,y:height*3/4.0}
-// drawTriangleFrame(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
+var p0 = {x:width/2.0,y:height*3/4.0}
+var p1 = {x:width/4.0,y:height/2.0}
+var p2 = {x:width*3/4.0,y:height/4.0}
+drawTriangleFrame(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
 drawTriangle(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
 

@@ -6,6 +6,9 @@
  * @param color 颜色
  */
 function drawPixel(ctx,x,y,color) {
+    const height = ctx.canvas.height;
+    y = height - y;
+    // 坐标原点在左下角
     ctx.fillStyle = color;
     ctx.fillRect(x, y, 1, 1);
 }
@@ -49,7 +52,7 @@ const width = c.width;
 const height = c.height;
 
 //变量african_head_data 从 african_head.js中加载
-//绘制人头
+// 绘制人头
 for(var i = 0 ; i < african_head_data.faces.length;i++ ){
     var face = african_head_data.faces[i];
    for(var j=0; j < 3;j++){
@@ -64,7 +67,7 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
        var x1 = (v1[0]+1.0)*width/2.0;
        var y1 = (v1[1]+1.0)*height/2.0;
        
-       drawLine(ctx,x0, y0, x1, y1,"0xff0000")
-
+       drawLine(ctx,x0, y0, x1, y1,"black")
    }
 }
+
