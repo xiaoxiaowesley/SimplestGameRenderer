@@ -59,10 +59,11 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
        var v0 = african_head_data.vertices[vIdx0];
        var v1 = african_head_data.vertices[vIdx1];
 
-       var x0 = (v0[0]+1.)*width/2.;
-       var y0 = (v0[1]+1.)*height/2.;
-       var x1 = (v1[0]+1.)*width/2.;
-       var y1 = (v1[1]+1.)*height/2.;
+       var x0 = (v0[0]+1.0)*width/2.0;
+       var y0 = (v0[1]+1.0)*height/2.0;
+       var x1 = (v1[0]+1.0)*width/2.0;
+       var y1 = (v1[1]+1.0)*height/2.0;
+       
        drawLine(ctx,x0, y0, x1, y1,"0xff0000")
 
    }
