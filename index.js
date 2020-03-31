@@ -79,3 +79,12 @@ function clear(ctx) {
     ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
 }
 
+
+function matrixAdd(mat1,mat2){
+    var ret = [[1,0,0,0],[0,1,0,0],,[0,0,1,0],[0,0,0,1]];
+    for(var row = 0 ; row < 4 ; row++){
+        for(var column = 0 ; column < 4 ; column++){
+            ret[row][co]
+        }
+    }
+}
