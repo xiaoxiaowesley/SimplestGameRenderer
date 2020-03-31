@@ -70,7 +70,23 @@ function drawTriangle(ctx,x0,y0,x1,y1,x2,y2,color) {
         var tmp = y1; y1 = y2; y2 = tmp;
         tmp = x1;  x1 = x2; x2 = tmp;
     }
-    var height = y2 - y1;
+
+//    drawLine(ctx,x0,y0,x1,y1,color)
+
+    //var p0 = y2 - y0;
+
+    var h02 = Math.abs(y0-y2);
+    var h01 = Math.abs(y0-y1);
+
+    for(var y = y0;y < y1; y++)
+    {
+        var deltaY = y0- y;
+        var xl = x0 + (x2-x0) * deltaY / h02;
+        var xr = x0 + (x1-x0) * deltaY / h01;
+        drawLine(ctx,xr,y,xl,y,color)
+    }
+
+   /* var height = y2 - y1;
     var distanceX = x2 - x1;
     for(var y = y0;y < y1; y++)
     {
@@ -79,7 +95,7 @@ function drawTriangle(ctx,x0,y0,x1,y1,x2,y2,color) {
         var x = x1 +dX;
 
         drawPixel(ctx,x,y,color)
-    }
+    }*/
 }
 
 ///////// main /////////
