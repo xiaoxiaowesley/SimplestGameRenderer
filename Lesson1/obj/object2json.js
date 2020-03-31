@@ -70,7 +70,6 @@ rl.on('line', function(line) {
             { vertexIndex:v2Idx,uvIndex:u2Idx,normalIndex:n2Idx },
             { vertexIndex:v3Idx,uvIndex:u3Idx,normalIndex:n3Idx }
         ])
-
     }
 });
 
