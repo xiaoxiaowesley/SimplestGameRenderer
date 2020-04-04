@@ -102,9 +102,26 @@ const width = c.width;
 const height = c.height;
 
 // 画三角形线框
-var p0 = {x:width/2.0,y:height*3/4.0}
-var p1 = {x:width/4.0,y:height/2.0}
-var p2 = {x:width*3/4.0,y:height/4.0}
-drawTriangleFrame(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
-drawTriangle(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
+// var p0 = {x:width/2.0,y:height*3/4.0}
+// var p1 = {x:width/4.0,y:height/2.0}
+// var p2 = {x:width*3/4.0,y:height/4.0}
+// drawTriangleFrame(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
+// drawTriangle(ctx,p0.x,p0.y,p1.x,p1.y,p2.x,p2.y,'red')
 
+for(var i = 0 ; i < african_head_data.faces.length;i++ ){
+    var face = african_head_data.faces[i];
+   for(var j=0; j < 3;j++){
+       var vIdx0 = face[j].vertexIndex;
+       var vIdx1 = face[(j+1)%3].vertexIndex;
+
+       var v0 = african_head_data.vertices[vIdx0];
+       var v1 = african_head_data.vertices[vIdx1];
+
+       var x0 = (v0[0]+1.0)*width/2.0;
+       var y0 = (v0[1]+1.0)*height/2.0;
+       var x1 = (v1[0]+1.0)*width/2.0;
+       var y1 = (v1[1]+1.0)*height/2.0;
+       
+       drawLine(ctx,x0, y0, x1, y1,"black")
+   }
+}

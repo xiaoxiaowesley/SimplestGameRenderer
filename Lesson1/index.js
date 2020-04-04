@@ -70,4 +70,3 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
        drawLine(ctx,x0, y0, x1, y1,"black")
    }
 }
-
