@@ -23,22 +23,43 @@ function drawPixel(ctx,x,y,color) {
  * @param color 颜色
  */
 function drawLine(ctx,x0,y0,x1,y1,color) {
-    //这里不是使用canvas自带的画线函数，用最原始的绘制一个一个像素点
-    //确保起始点在左，结束点在右
-    if(x0 > x1 ){
-        //swap x and y
-        var tmp = x1;
-        x1 = x0;
-        x0 = tmp;
-
-        tmp = y1;
-        y1 = y0;
+    var steep = false; 
+    
+    if (Math.abs(x0-x1)<Math.abs(y0-y1)) { 
+        var tmp = x0;
+        x0 = y0;
         y0 = tmp;
-    }
-    for (var x=x0; x<=x1; x++) {
-        var t = (x-x0)/(x1-x0);
-        var y = y0*(1.-t) + y1*t;
-        drawPixel(ctx,x,y,color);
+
+        tmp = x1;
+        x1 = y1;
+        y1 = tmp
+        steep = true; 
+    } 
+    if (x0>x1) { 
+        var tmp = x0;
+        x0 = x1;
+        x1 = tmp;
+
+        tmp = y0;
+        y0 = y1;
+        y1 = tmp;
+    } 
+    var dx = x1-x0; 
+    var dy = y1-y0; 
+    var derror2 = Math.abs(dy)*2; 
+    var error2 = 0; 
+    var y = y0; 
+    for (var x=x0; x<=x1; x++) { 
+        if (steep) { 
+            drawPixel(ctx,y,x,color);
+        } else { 
+            drawPixel(ctx,x,y,color);
+        } 
+        error2 += derror2; 
+        if (error2 > dx) { 
+            y += (y1>y0?1:-1); 
+            error2 -= dx*2; 
+        } 
     }
 }
 
@@ -56,8 +77,11 @@ const height = c.height;
 for(var i = 0 ; i < african_head_data.faces.length;i++ ){
     var face = african_head_data.faces[i];
    for(var j=0; j < 3;j++){
-       var vIdx0 = face[j].vertexIndex;
-       var vIdx1 = face[(j+1)%3].vertexIndex;
+       var idx0 = j;
+       var idx1 = (j+1)%3;
+       //文件存储数组的下标都是1起始的。这里-1是为了适应
+       var vIdx0 = face[j].vertexIndex -1;
+       var vIdx1 = face[(j+1)%3].vertexIndex -1;
 
        var v0 = african_head_data.vertices[vIdx0];
        var v1 = african_head_data.vertices[vIdx1];
@@ -68,5 +92,6 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
        var y1 = (v1[1]+1.0)*height/2.0;
        
        drawLine(ctx,x0, y0, x1, y1,"black")
+
    }
 }
