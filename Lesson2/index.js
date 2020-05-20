@@ -63,56 +63,77 @@ function drawLine(ctx,x0,y0,x1,y1,color) {
     }
 }
 
-
 /**
- * 绘制线
+ * 绘制三角形（填充）
  * @param {*} ctx 
  * @param {*} t0 
  * @param {*} t1 
  * @param {*} t2 
  * @param {*} color 
  */
+
 function drawTriangle(ctx,t0,t1,t2,color){
-    if (t0.y>t1.y) 
-    {
-        // std::swap(t0, t1); 
+    if (t0.y>t1.y) {
         var tmp = t0;
         t0 = t1;
         t1 = tmp;
     }
-    if (t0.y>t2.y) 
-    {
-        // std::swap(t0, t2);
+    if (t0.y>t2.y) {
         var tmp = t0;
         t0 = t2;
         t2 = tmp;
-    }
-    if (t1.y>t2.y) 
-    {
-        // std::swap(t1, t2); 
+    } 
+    if (t1.y>t2.y) {
         var tmp = t1;
         t1 = t2;
         t2 = tmp;
-    }
-    var total_height = t2.y-t0.y;
-    for (var y=t0.y; y<=t1.y; y++) { 
-        var segment_height = t1.y-t0.y+1; 
-        var alpha = (y-t0.y)/total_height; 
-        var beta  = (y-t0.y)/segment_height; // be careful with divisions by zero 
-        var A = {
-            x:t0.x + (t2.x-t0.x)*alpha,
-            y:t0.y + (t2.y-t0.y)*alpha
-        }
-        var B = {
-            x: t0.x + (t1.x-t0.x)*beta,
-            y: t0.y + (t1.y-t0.y)*beta
-        }
-        drawPixel(ctx,A.x,y,color)
-        drawPixel(ctx,B.x,y,color)
     } 
 
+    var total_height = t2.y-t0.y; 
+    for (var  i=0; i<total_height; i++) { 
+        var second_half = i>t1.y-t0.y || t1.y==t0.y; 
+        var  segment_height = second_half ? t2.y-t1.y : t1.y-t0.y; 
+        var alpha = i/total_height; 
+        var beta  = (i-(second_half ? t1.y-t0.y : 0))/segment_height; // be careful: with above conditions no division by zero here 
+        var A = {
+            x:t0.x + (t2.x-t0.x)*alpha,
+            y:t0.y + (t2.x-t0.y)*alpha
+        }       
+        var B = {
+            x:t0.x + (t1.x-t0.x)*beta,
+            y:t0.y + (t1.y-t0.y)*beta
+        }
+        if(second_half){
+            B = {
+                x:t1.x + (t2.x-t1.x)*beta,
+                y:t1.y + (t2.y-t1.y)*beta
+            }
+        }
+        if (A.x>B.x) 
+        {
+            var tmp = A;
+            A = B;
+            B = tmp;
+        }
+        for (var  j=A.x; j<=B.x; j++) { 
+            drawPixel(ctx,j, t0.y+i, color)
+        } 
+    } 
 }
 
+/**
+ * 绘制三角形（线框）
+ * @param {*} ctx 
+ * @param {*} t0 
+ * @param {*} t1 
+ * @param {*} t2 
+ * @param {*} color 
+ */
+function drawTriangleFrame(ctx,t0,t1,t2,color){
+    drawLine(ctx,t0.x,t0.y,t1.x,t1.y);
+    drawLine(ctx,t2.x,t2.y,t1.x,t1.y);
+    drawLine(ctx,t2.x,t2.y,t0.x,t0.y);
+}
 
 ///////// main /////////
 var c=document.getElementById("myCanvas");
@@ -147,24 +168,7 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
         y: (v2[1]+1.0)*height/2.0
     }
 
-    drawTriangle(ctx,pt0,pt1,pt2,"black")
-
-//    for(var j=0; j < 3;j++){
-//        var idx0 = j;
-//        var idx1 = (j+1)%3;
-//        //文件存储数组的下标都是1起始的。这里-1是为了适应
-//        var vIdx0 = face[j].vertexIndex -1;
-//        var vIdx1 = face[(j+1)%3].vertexIndex -1;
-
-//        var v0 = african_head_data.vertices[vIdx0];
-//        var v1 = african_head_data.vertices[vIdx1];
-
-//        var x0 = (v0[0]+1.0)*width/2.0;
-//        var y0 = (v0[1]+1.0)*height/2.0;
-//        var x1 = (v1[0]+1.0)*width/2.0;
-//        var y1 = (v1[1]+1.0)*height/2.0;
-       
-//        drawLine(ctx,x0, y0, x1, y1,"black")
-
-//    }
+    //随机颜色
+    var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    drawTriangle(ctx,pt0,pt1,pt2,color)
 }
