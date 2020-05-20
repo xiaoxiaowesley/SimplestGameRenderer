@@ -155,20 +155,39 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
     var v1 = african_head_data.vertices[vIdx1];
     var v2 = african_head_data.vertices[vIdx2];
 
-    var pt0 = {
+    var screenPt0 = {
         x:(v0[0]+1.0)*width/2.0,
         y:(v0[1]+1.0)*height/2.0
     }
-    var pt1 ={
+    var screenPt1 ={
         x: (v1[0]+1.0)*width/2.0,
         y: (v1[1]+1.0)*height/2.0
     }
-    var pt2 = {
+    var screenPt2 = {
         x: (v2[0]+1.0)*width/2.0,
         y: (v2[1]+1.0)*height/2.0
     }
 
-    //随机颜色
-    var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
-    drawTriangle(ctx,pt0,pt1,pt2,color)
+    // 随机颜色
+    // var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    //drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
+
+    // 根据深度呈现不同的颜色。法线和光线的角度越小，颜色越浅
+    // 计算法线 - (三点决定一个平面。垂直于平面能做一条个向量，称之为法线)
+    // 用法线和光线的叉乘来衡量角度
+    var x1 = v0.x - v1.x;
+    var y1 = v0.y - v1.y;
+    var z1 = v0.z - v1.z;
+    var x2 = v0.x - v2.x;
+    var y2 = v0.y - v2.y;
+    var z2 = v0.z - v2.z;
+    var normal = {
+        x:(y1*z2 - y2*z1),
+        y:(z1*x2 - z2*x1),
+        z:(x1*y2 - x2*y1)
+    }
+    var lightDir = {x:1.0,y:1.0,z:-1};
+    var intensity = (normal.x*lightDir.x + normal.y*lightDir.y+normal.z+lightDir.z);
+    var color = '#'+(intensity*0xFFFFFF<<0).toString(16);
+    drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
 }
