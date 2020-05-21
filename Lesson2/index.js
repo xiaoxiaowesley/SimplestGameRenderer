@@ -121,6 +121,19 @@ function drawTriangle(ctx,t0,t1,t2,color){
     } 
 }
 
+function CrossProduct(u,v){
+    return { x:(u.y*v.z-u.z*v.y), y:(u.z*v.x-u.x*v.z), z:(u.x*v.y-u.y*v.x)  }
+}
+
+function DotProduct(u,v){
+    return u.x * v.x + u.y * v.y + u.z * v.z;
+}
+
+function Normalize(u){
+    var magnitude = Math.sqrt(u.x*u.x+u.y+u.y+u.z*u.z);
+    return {  x:u.x / magnitude, y:u.y / magnitude,  z:u.z / magnitude }
+}
+
 /**
  * 绘制三角形（线框）
  * @param {*} ctx 
@@ -173,21 +186,32 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
     //drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
 
     // 根据深度呈现不同的颜色。法线和光线的角度越小，颜色越浅
-    // 计算法线 - (三点决定一个平面。垂直于平面能做一条个向量，称之为法线)
-    // 用法线和光线的叉乘来衡量角度
-    var x1 = v0.x - v1.x;
-    var y1 = v0.y - v1.y;
-    var z1 = v0.z - v1.z;
-    var x2 = v0.x - v2.x;
-    var y2 = v0.y - v2.y;
-    var z2 = v0.z - v2.z;
-    var normal = {
-        x:(y1*z2 - y2*z1),
-        y:(z1*x2 - z2*x1),
-        z:(x1*y2 - x2*y1)
+    // 用法线和光线的点乘来衡量角度
+    var u = {
+        x:(v2[0] - v0[0]),
+        y:(v2[1] - v0[1]),
+        z:(v2[2] - v0[2])
     }
-    var lightDir = {x:1.0,y:1.0,z:-1};
-    var intensity = (normal.x*lightDir.x + normal.y*lightDir.y+normal.z+lightDir.z);
-    var color = '#'+(intensity*0xFFFFFF<<0).toString(16);
-    drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
+    var v = {
+        x: (v1[0] - v0[0]),
+        y: (v1[1] - v0[1]),
+        z: (v1[2] - v0[2])
+    }
+
+    var normal = CrossProduct(u,v);
+    normal = Normalize(normal);
+
+    var lightDir = {x:0.0,y:0.0,z:-1};
+
+    var intensity = DotProduct(lightDir,normal);
+
+    if (intensity =>0) {
+        var channel = Math.floor(0xff * intensity);
+        if (channel > 0) {
+            debugger
+        }
+        var grey = channel < 10? '0'+channel.toString(16) : channel.toString(16);
+        var color = '#' +grey+grey+grey;
+        drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
+    }
 }
