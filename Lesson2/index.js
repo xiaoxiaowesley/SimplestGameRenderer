@@ -71,54 +71,59 @@ function drawLine(ctx,x0,y0,x1,y1,color) {
  * @param {*} t2 
  * @param {*} color 
  */
-
-function drawTriangle(ctx,t0,t1,t2,color){
-    if (t0.y>t1.y) {
-        var tmp = t0;
-        t0 = t1;
-        t1 = tmp;
+function drawTriangle(ctx,A,B,C,color){
+    if (A.y>B.y) {
+        var tmp = A;
+        A = B;
+        B = tmp;
     }
-    if (t0.y>t2.y) {
-        var tmp = t0;
-        t0 = t2;
-        t2 = tmp;
+    if (A.y>C.y) {
+        var tmp = A;
+        A = C;
+        C = tmp;
     } 
-    if (t1.y>t2.y) {
-        var tmp = t1;
-        t1 = t2;
-        t2 = tmp;
+    if (B.y>C.y) {
+        var tmp = B;
+        B = C;
+        C = tmp;
     } 
 
-    var total_height = t2.y-t0.y; 
-    for (var  i=0; i<total_height; i++) { 
-        var second_half = i>t1.y-t0.y || t1.y==t0.y; 
-        var  segment_height = second_half ? t2.y-t1.y : t1.y-t0.y; 
-        var alpha = i/total_height; 
-        var beta  = (i-(second_half ? t1.y-t0.y : 0))/segment_height; // be careful: with above conditions no division by zero here 
-        var A = {
-            x:t0.x + (t2.x-t0.x)*alpha,
-            y:t0.y + (t2.x-t0.y)*alpha
-        }       
-        var B = {
-            x:t0.x + (t1.x-t0.x)*beta,
-            y:t0.y + (t1.y-t0.y)*beta
-        }
-        if(second_half){
-            B = {
-                x:t1.x + (t2.x-t1.x)*beta,
-                y:t1.y + (t2.y-t1.y)*beta
-            }
-        }
-        if (A.x>B.x) 
-        {
-            var tmp = A;
-            A = B;
-            B = tmp;
-        }
-        for (var  j=A.x; j<=B.x; j++) { 
-            drawPixel(ctx,j, t0.y+i, color)
-        } 
+    var dx1 =0;
+    var dx2 =0;
+    var dx3 =0;
+    if (B.y-A.y > 0)
+    {
+        dx1=(B.x-A.x)/(B.y-A.y) 
+    }
+    else{
+        dx1=0;
     } 
+    if (C.y-A.y > 0) 
+    {
+        dx2=(C.x-A.x)/(C.y-A.y) 
+    }
+    else{
+        dx2=0;
+    } 
+    if (C.y-B.y > 0)
+    {
+        dx3=(C.x-B.x)/(C.y-B.y)
+    }
+    else{
+        dx3=0;
+    }
+
+    for(var y = A.y; y <= B.y; y++){
+        var xInAB = dx1 * ( y - A.y) + A.x;
+        var xInAC = dx2 * ( y - A.y) + A.x;
+        drawLine(ctx,xInAB,y,xInAC,y,color);
+    }
+
+    for(var y = B.y; y <= C.y; y++){
+        var xInBC = dx3 * ( y - C.y) + C.x;
+        var xInAC = dx2 * ( y - C.y) + C.x;
+        drawLine(ctx,xInBC,y,xInAC,y,color);
+    }
 }
 
 function CrossProduct(u,v){
@@ -207,9 +212,6 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
 
     if (intensity =>0) {
         var channel = Math.floor(0xff * intensity);
-        if (channel > 0) {
-            debugger
-        }
         var grey = channel < 10? '0'+channel.toString(16) : channel.toString(16);
         var color = '#' +grey+grey+grey;
         drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
