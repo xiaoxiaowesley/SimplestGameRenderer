@@ -135,7 +135,7 @@ function DotProduct(u,v){
 }
 
 function Normalize(u){
-    var magnitude = Math.sqrt(u.x*u.x+u.y+u.y+u.z*u.z);
+    var magnitude = Math.sqrt(u.x*u.x+u.y*u.y+u.z*u.z);
     return {  x:u.x / magnitude, y:u.y / magnitude,  z:u.z / magnitude }
 }
 
@@ -210,7 +210,7 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
 
     var intensity = DotProduct(lightDir,normal);
 
-    if (intensity =>0) {
+    if (intensity >0) {
         var channel = Math.floor(0xff * intensity);
         var grey = channel < 10? '0'+channel.toString(16) : channel.toString(16);
         var color = '#' +grey+grey+grey;
