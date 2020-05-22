@@ -9,11 +9,16 @@ function drawPixel(ctx,x,y,z,color) {
     const height = ctx.canvas.height;
     y = height - y;
 
-    // var idx = x + y*width;
-    // var z = zbuffer[idx];
-    // 坐标原点在左下角
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, 1, 1);
+    y = Math.floor(y);
+    x = Math.floor(x);
+    var idx = x + y*width;
+    var zb = zbuffer[idx];
+    if(zb < z){
+        zbuffer[idx] = z;
+        // 坐标原点在左下角
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, 1, 1);
+    }
 }
 
 /**
@@ -25,12 +30,22 @@ function drawPixel(ctx,x,y,z,color) {
  * @param {*} color 
  */
 function drawTriangle(ctx,A,B,C,color){
+
+    //小数部分四舍五入
+    A.x = Math.floor(A.x+0.5)
+    A.y = Math.floor(A.y+0.5)
+    A.z = Math.floor(A.z+0.5)
+    B.x = Math.floor(B.x+0.5)
+    B.y = Math.floor(B.y+0.5)
+    B.z = Math.floor(B.z+0.5)
+    C.x = Math.floor(C.x+0.5)
+    C.y = Math.floor(C.y+0.5)
+    C.z = Math.floor(C.z+0.5)
+
    //使用Barycentric Coordinates(重心坐标系插值)算法
    //http://blog.atelier39.org/cg/533.html
-   //1. 先得到最大包围盒
    var minX = Math.min(A.x,B.x,C.x);
    var maxX = Math.max(A.x,B.x,C.x);
-
    var minY = Math.min(A.y,B.y,C.y);
    var maxY = Math.max(A.y,B.y,C.y);
 
@@ -40,14 +55,20 @@ function drawTriangle(ctx,A,B,C,color){
    var y1 = A.y;
    var y2 = B.y;
    var y3 = C.y;
-   for (var x = minX; x < maxX; x++) {
-       for (let y = minY; y < maxY; y++) {
+   var z1 = A.z;
+   var z2 = B.z;
+   var z3 = C.z;
+   for (var x = minX; x <= maxX; x++) {
+       for (let y = minY; y <= maxY; y++) {
         var c = ((y1-y2)*x+(x2-x1)*y+x1*y2-x2*y1)/((y1-y2)*x3+(x2-x1)*y3+x1*y2-x2*y1);
         var b = ((y1-y3)*x+(x3-x1)*y+x1*y3-x3*y1)/((y1-y3)*x2+(x3-x1)*y2+x1*y3-x3*y1);
         var a = 1-b-c;
-        if (a >= 0 && a <= 1 && b >= 0 && b <= 1 && c >= 0 && c <= 1)
+        //这里要注意js中的浮点数比较
+        var zero = -1e-10;
+        if (a >= zero && a <= 1 && b >= zero && b <= 1 && c >= zero && c <= 1)
         {
-            drawPixel(ctx,x,y,0,color);
+            var z = a * z1 + b * z2 + c * z3;
+            drawPixel(ctx,x,y,z,color);
         }
     }
    }
@@ -62,7 +83,7 @@ function DotProduct(u,v){
 }
 
 function Normalize(u){
-    var magnitude = Math.sqrt(u.x*u.x+u.y+u.y+u.z*u.z);
+    var magnitude = Math.sqrt(u.x*u.x+u.y*u.y+u.z*u.z);
     return {  x:u.x / magnitude, y:u.y / magnitude,  z:u.z / magnitude }
 }
 
@@ -73,6 +94,16 @@ var ctx=c.getContext("2d");
 const width = c.width;
 //高
 const height = c.height;
+
+//z buffer
+var zbuffer = [];
+for (let w = 0; w < width; w++) {
+    for (let h = 0; h < height; h++) {
+        zbuffer[w+h*width] = Number.NEGATIVE_INFINITY;
+    }
+}
+
+var count = 0;
 
 //变量african_head_data 从 african_head.js中加载
 // 绘制人头
@@ -108,40 +139,28 @@ for(var i = 0 ; i < african_head_data.faces.length;i++ ){
 
     // 根据深度呈现不同的颜色。法线和光线的角度越小，颜色越浅
     // 用法线和光线的点乘来衡量角度
-    var u = {
+    var dir1 = {
         x:(v2[0] - v0[0]),
         y:(v2[1] - v0[1]),
         z:(v2[2] - v0[2])
     }
-    var v = {
+    var dir2 = {
         x: (v1[0] - v0[0]),
         y: (v1[1] - v0[1]),
         z: (v1[2] - v0[2])
     }
 
-    var normal = CrossProduct(u,v);
+    var normal = CrossProduct(dir1,dir2);
     normal = Normalize(normal);
 
     var lightDir = {x:0.0,y:0.0,z:-1};
 
     var intensity = DotProduct(lightDir,normal);
 
-    if (intensity =>0) {
+    if (intensity >0.0) {
         var channel = Math.floor(0xff * intensity);
         var grey = channel < 10? '0'+channel.toString(16) : channel.toString(16);
         var color = '#' +grey+grey+grey;
         drawTriangle(ctx,screenPt0,screenPt1,screenPt2,color)
     }
 }
-
-var zbuffer = [];
-for (let w = 0; w < width; w++) {
-    for (let h = 0; h < height; h++) {
-        zbuffer[w+h*width] = Number.NEGATIVE_INFINITY;
-    }
-}
-
-// var A = {x:0,y:0}
-// var C = {x:100,y:50}
-// var B = {x:100,y:100}
-// drawTriangle(ctx,A,B,C,"black")
